@@ -1,0 +1,6 @@
+[submodule "cmake/clang"]
+	path = cmake/clang
+	url = https://github.com/Xaymar/cmake-clang.git
+[submodule "third-party/curl"]
+	path = third-party/curl
+	url = https://github.com/curl/curl.git

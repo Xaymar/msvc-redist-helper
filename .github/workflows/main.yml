@@ -1,0 +1,46 @@
+name: Build
+
+on: push
+
+jobs:
+  windows:
+    name: "Windows"
+    strategy:
+      matrix: 
+        runner: [ windows-2019 ]
+        arch: [ 32, 64 ]
+        include:
+          - runner: windows-2019
+            arch: 64
+            windows_sdk: "10.0.18362.0"
+            cmake_generator: "Visual Studio 16 2019"
+            cmake_generator_platform: "x64"
+          - runner: windows-2019
+            arch: 32
+            windows_sdk: "10.0.18362.0"
+            cmake_generator: "Visual Studio 16 2019"
+            cmake_generator_platform: "Win32"
+    runs-on: ${{ matrix.runner }}
+    env:
+      CMAKE_GENERATOR: ${{ matrix.cmake_generator }}
+      CMAKE_GENERATOR_PLATFORM: ${{ matrix.cmake_generator_platform }}
+      CMAKE_SYSTEM_VERSION: ${{ matrix.windows_sdk }}
+    steps:
+    - name: "Clone Repository"
+      uses: actions/checkout@v1
+    - name: "Clone Submodules"
+      shell: bash
+      run: git submodule update --init --recursive
+    - name: "Configure Project"
+      shell: bash
+      run: |
+        cmake -H. -B"build/flux" -DSIGN_ENABLED=ON -DSIGN_KEY="${PWD}/ci/code-signing-cert-win.pfx" -DSIGN_PASSWORD="${{ secrets.CODESIGN_CERT_PASSWORD }}"
+    - name: "Build Project"
+      shell: bash
+      run: |
+        cmake --build "build/flux" --config MinSizeRel --target msvc-redist-helper
+    - name: "Upload Artifacts"
+      uses: actions/upload-artifact@v1
+      with:
+        name: msvc-redist-helper-${{ matrix.arch }}
+        path: build/flux/MinSizeRel/msvc-redist-helper.exe
