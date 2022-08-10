@@ -23,7 +23,7 @@ endif()
 
 # Automatic Versioning
 set(VERSION_MAJOR 0)
-set(VERSION_MINOR 1)
+set(VERSION_MINOR 2)
 set(VERSION_PATCH 0)
 set(VERSION_TWEAK 0)
 set(VERSION_SUFFIX "")
@@ -86,7 +86,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR (WIN32 AND CMAKE_CXX_COMPILER_ID STR
 	# - Enable multi-processor compiling.
 
 	# Enable most useful warnings.
-	set(DISABLED_WARNINGS 
+	set(DISABLED_WARNINGS
 		"/wd4061" "/wd4100" "/wd4180" "/wd4201" "/wd4464" "/wd4505" "/wd4514"
 		"/wd4571" "/wd4623" "/wd4625" "/wd4626" "/wd4668" "/wd4710" "/wd4774"
 		"/wd4820" "/wd5026" "/wd5027" "/wd5039" "/wd5045" "/wd26812"
@@ -113,11 +113,11 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" OR (WIN32 AND CMAKE_CXX_COMPILER_ID STR
 
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 	message(STATUS "Applying custom flags for GNU style build.")
-	
+
 	# Clang/AppleClang/GNU
 	# - Don't export by default.
 	# - Enable all and extra warnings.
-	
+
 	add_compile_options("-Wall")
 	add_compile_options("-Wextra")
 	add_compile_options("-fvisibility=hidden")
@@ -131,13 +131,7 @@ set(_CXX_EXTENSIONS OFF)
 
 ################################################################################
 # Options
-################################################################################
-
-
-# Code Signing
-set(${PropertyPrefix}SIGN_ENABLED FALSE CACHE BOOL "Enable signing builds.")
-set(${PropertyPrefix}SIGN_KEY "" CACHE FILEPATH "Path to the private key with which to sign.")
-set(${PropertyPrefix}SIGN_PASSWORD "" CACHE STRING "Password for the private key.")
+###############################################################################
 
 ################################################################################
 # Project Setup
@@ -283,7 +277,7 @@ if(HAVE_CLANG)
 		TARGETS ${PROJECT_NAME}
 	)
 	clang_tidy(
-		TARGETS ${PROJECT_NAME}		
+		TARGETS ${PROJECT_NAME}
 		VERSION 9.0.0
 	)
 	clang_format(
@@ -291,26 +285,6 @@ if(HAVE_CLANG)
 		DEPENDENCY
 		VERSION 9.0.0
 	)
-endif()
-
-# Signing
-if(${PropertyPrefix}SIGN_ENABLED)
-	# Investigate: https://github.com/Monetra/mstdlib/blob/master/CMakeModules/CodeSign.cmake
-	if(MSVC) 
-		find_program(${PropertyPrefix}SIGN_TOOL
-			NAMES "signtool"
-			DOC "Path to the signing tool."
-			REQUIRED
-		)
-		
-		if(${PropertyPrefix}SIGN_TOOL)
-			message(STATUS "${PROJECT_NAME}: Signing enabled")
-			add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-				COMMAND ${${PropertyPrefix}SIGN_TOOL}
-				ARGS sign /p "${${PropertyPrefix}SIGN_PASSWORD}" /f "${${PropertyPrefix}SIGN_KEY}" $<TARGET_FILE:${PROJECT_NAME}>
-			)
-		endif()
-	endif()
 endif()
 
 ################################################################################

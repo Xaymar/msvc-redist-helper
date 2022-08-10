@@ -6,7 +6,7 @@ jobs:
   windows:
     name: "Windows"
     strategy:
-      matrix: 
+      matrix:
         runner: [ windows-2019 ]
         arch: [ 32, 64 ]
         include:
@@ -34,7 +34,7 @@ jobs:
     - name: "Configure Project"
       shell: bash
       run: |
-        cmake -H. -B"build/flux" -DSIGN_ENABLED=ON -DSIGN_KEY="${PWD}/ci/code-signing-cert-win.pfx" -DSIGN_PASSWORD="${{ secrets.CODESIGN_CERT_PASSWORD }}"
+        cmake -H. -B"build/flux"
     - name: "Build Project"
       shell: bash
       run: |
