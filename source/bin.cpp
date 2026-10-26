@@ -171,7 +171,7 @@ const std::list<redists> known_redists = {
 	},
 	{
 		// 140
-		{2015, 2017, 2019, 2022},
+		{2015, 2017, 2019, 2022, 2026},
 		{
 			"concrt140.dll",
 #if defined(IS_X86) && defined(IS_64BIT)
@@ -356,13 +356,17 @@ void install_libraries(int32_t version, const std::list<std::pair<std::string, s
 bool test_libraries(const std::set<std::filesystem::path>& libs)
 {
 	for (auto& lib : libs) {
+		std::cout << format_string("Checking '%s'...", lib.string().c_str());
+
 		auto    lib_name   = lib.wstring();
 		HMODULE lib_handle = LoadLibraryW(lib_name.data());
 		auto    lib_ref    = std::shared_ptr<void>(static_cast<void*>(lib_handle),
                                              [](void* ptr) { FreeLibrary(static_cast<HMODULE>(ptr)); });
 		if (!lib_ref) {
-			std::cout << format_string("Missing library '%s'.", lib.string().c_str()) << std::endl;
+			std::cout << format_string(" Missing!") << std::endl;
 			return false;
+		} else {
+			std::cout << format_string(" Found.") << std::endl;
 		}
 	}
 	return true;
